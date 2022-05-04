@@ -1,0 +1,96 @@
+<CompuCell3D Revision="20210612" Version="4.2.5">
+
+   <Metadata>
+
+      <!-- Basic properties simulation -->
+      <NumberOfProcessors>8</NumberOfProcessors>
+      <DebugOutputFrequency>10</DebugOutputFrequency>
+      <!-- <NonParallelModule Name="Potts"/> -->
+   </Metadata>
+
+   <Potts>
+
+      <!-- Basic properties of CPM (GGH) algorithm -->
+      <Dimensions x="120" y="60" z="1"/>
+      <Steps>202000</Steps>
+      <Temperature>16.0</Temperature>
+      <NeighborOrder>3</NeighborOrder>
+   </Potts>
+
+   <Plugin Name="CellType">
+
+      <!-- Listing all cell types in the simulation -->
+      <CellType TypeId="0" TypeName="Medium"/>
+      <CellType TypeId="1" TypeName="cell1"/>
+      <CellType TypeId="2" TypeName="Wall" Freeze=""/>
+   </Plugin>
+
+
+   <Plugin Name="Volume"/>
+
+   <Plugin Name="Surface"/>
+
+
+   <Plugin Name="CenterOfMass">
+
+      <!-- Module tracking center of mass of each cell -->
+   </Plugin>
+
+   <Plugin Name="Contact">
+      <!-- &lt;!&ndash; Specification of adhesion energies &ndash;&gt; -->
+      <Energy Type1="Medium" Type2="Medium">5.0</Energy>
+      <Energy Type1="Medium" Type2="cell1">5.0</Energy>
+      <Energy Type1="cell1" Type2="cell1">-5.0</Energy>
+      <Energy Type1="Wall" Type2="Wall">0.0</Energy>
+      <Energy Type1="Medium" Type2="Wall">0.0</Energy>
+      <Energy Type1="cell1" Type2="Wall">50.0</Energy>
+      <NeighborOrder>4</NeighborOrder>
+   </Plugin>
+
+   <Plugin Name="Chemotaxis">
+
+      <!-- You may repeat ChemicalField element for each chemical field declared in the PDE solvers -->
+      <!-- Specification of chemotaxis properties of select cell types. -->
+      <ChemicalField Name="glucose">
+         <!-- <ChemotaxisByType Lambda="3.0" Type="cell1"/> -->
+      </ChemicalField>
+   </Plugin>
+
+   <Steppable Type="DiffusionSolverFE">
+
+      <!-- Specification of PDE solvers -->
+      <DiffusionField Name="glucose">
+         <DiffusionData>
+            <FieldName>glucose</FieldName>
+            <GlobalDiffusionConstant>0.0</GlobalDiffusionConstant>
+            <GlobalDecayConstant>0.0</GlobalDecayConstant>
+            <InitialConcentrationExpression>x/10.0</InitialConcentrationExpression>
+         </DiffusionData>
+         <BoundaryConditions>
+            <Plane Axis="X">
+               <ConstantValue PlanePosition="Min" Value="0.0"/>
+               <ConstantValue PlanePosition="Max" Value="12.8"/>
+            </Plane>
+            <Plane Axis="Y">
+
+               <ConstantValue PlanePosition="Min" Value="0.0"/>
+               <ConstantValue PlanePosition="Max" Value="12.8"/>
+            </Plane>
+         </BoundaryConditions>
+      </DiffusionField>
+   </Steppable>
+
+   <Steppable Type="BlobInitializer">
+   
+   <!-- Initial layout of cells in the form of spherical (circular in 2D) blob -->
+       <Region>
+          <Center x="10" y="30" z="0"/>
+          <Radius>4</Radius>
+          <Gap>0</Gap>
+          <Width>7</Width>
+          <Types>cell1</Types>
+       </Region>
+    </Steppable>
+
+
+</CompuCell3D>
